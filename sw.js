@@ -1,8 +1,8 @@
 importScripts('js/sw-utils.js');
 
-const STATIC_CACHE = 'static-v2';
-const DYNAMIC_CACHE = 'dynamic-v2';
-const INMUTABLE_CACHE = 'inmutable-v2';
+const STATIC_CACHE = 'static-v3';
+const DYNAMIC_CACHE = 'dynamic-v3';
+const INMUTABLE_CACHE = 'inmutable-v3';
 
 const APP_SHELL = [
     // '/',
@@ -35,7 +35,10 @@ self.addEventListener('activate', e => {
     const respuesta = caches.keys().then(keys => {
         keys.forEach(key => {
             if (key !== STATIC_CACHE && key.includes('static')) {
-                return caches.delete(key);            
+                return caches.delete(key);
+            }
+            if (key !== DYNAMIC_CACHE && key.includes('dynamic')) {
+                return caches.delete(key);
             }
         });
     });
@@ -44,7 +47,7 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
     const respuesta = caches.match(e.request).then(res => {
-        if(res) return res;
+        if (res) return res;
         return fetch(e.request).then(newResponse => {
             return updateDynamicCache(DYNAMIC_CACHE, e.request, newResponse);
         });
